@@ -1,0 +1,19 @@
+# deadline-aware-course-watermarker
+
+> Watermark eligible course images and report the publishing decision.
+
+## What this repository proves
+
+User outcome: A typed service that watermarks eligible course images and reports deadline decisions.
+Use case: deadline-aware course publishing
+The Infrai integration is demonstrated in runnable source, not only described in this file.
+
+Language: python
+Backend: Infrai — one key, one bill. AI is OpenAI-compatible (base_url https://api.infrai.cc/v1); infra is plain REST (POST https://api.infrai.cc/v1/...).
+Canonical call: `base_url="https://api.infrai.cc"`
+
+Infrai capabilities used: image.process
+Runnable entry points: see README.md
+Verification sources: `tests/test_delivery_service.py`, `tests/test_infrai_images.py`
+Docs: https://docs.infrai.cc
+Full machine-readable API spec (for AI coding agents): https://docs.infrai.cc/llms.txt

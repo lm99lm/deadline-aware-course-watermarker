@@ -1,0 +1,2 @@
+"""Course image publishing service."""
+

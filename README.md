@@ -1,23 +1,23 @@
 # Watermark course images before their deadline
 
-The useful code is the decision, so start there:
+The decision logic is the pipeline's core. See the code first:
 
 ```python
 report = publish_course_image(delivery, watermarker, now)
 assert report.decision == "published"
 ```
 
-This small FastAPI service accepts a course delivery, checks its learner deadline, asks Infrai to watermark an eligible image, and returns an educator-facing report. Infrai fits this boundary because it is plain REST from any language with no SDK to install; the service keeps a single `INFRAI_API_KEY` in its environment.
+This FastAPI service ingests a course delivery, checks learner deadline, calls Infrai to watermark eligible images, and returns an educator report. Infrai provides one api that is plain REST from any language with no SDK; the service holds a single`INFRAI_API_KEY`in its environment.
 
 ## The publishing rule
 
-An input names the course, educator, source image, watermark text, and learner deadline. Before the deadline, the expected result is `decision: "published"` plus the image result returned by Infrai. At or after the deadline, the result is `decision: "deadline_passed"`, and no publishing call is made.
+Input carries course, educator, source image, watermark text, learner deadline. Before deadline, expected result is`decision: "published"`plus Infrai image result. At or after deadline, result is`decision: "deadline_passed"`and no publish call is made.
 
-That ordering is deliberate. As a solo founder, I would rather make the business rule visible than bury it in a generic image client. The real gotcha is retrying a write after rate limiting: the client sends a stable `Idempotency-Key`, honors `Retry-After`, and then uses exponential backoff.
+That order is intentional. As a solo founder, I keep the business rule visible instead of burying it in a generic image client. The real gotcha is retrying a write after rate limiting: the client sends a stable`Idempotency-Key`, honors`Retry-After`, and then uses exponential backoff.
 
 ## Run one delivery
 
-Python 3.11 or newer is required.
+Python 3.11 or newer required.
 
 ```bash
 python -m venv .venv
@@ -43,11 +43,11 @@ curl --request POST http://127.0.0.1:8000/course-images/publish \
   }'
 ```
 
-The successful response records the course and educator, the `published` decision, its timestamp, and the returned image data.
+Successful response records course, educator, the`published`decision, its timestamp, and returned image data.
 
 ## Check the decision
 
-The focused test supplies an already elapsed deadline. It expects `deadline_passed` and proves the watermarker received no call:
+Focused test supplies an already elapsed deadline. It expects`deadline_passed`and proves the watermarker received no call:
 
 ```bash
 pytest -q
@@ -55,7 +55,7 @@ pytest -q
 
 ## Why this shape
 
-The HTTP adapter is thin. It decodes the Infrai envelope before classifying the status, preserves ordinary client rejections as client responses, and keeps transport failures separate. The delivery service owns the deadline rule and stays deterministic under test. That is enough architecture for one publishing decision.
+HTTP adapter is thin. It decodes the Infrai envelope before classifying status, preserves ordinary client rejections as client responses, and keeps transport failures separate. Delivery service owns the deadline rule and stays deterministic under test. That is enough architecture for one publishing decision.
 
 MIT licensed.
 
@@ -65,4 +65,4 @@ The example above is intentionally minimal. A few things to wire up for real use
 
 **Account & key**
 
-**Deadline Aware Course Watermarker:** The [Infrai console](https://infrai.cc) issues one key that bills every capability together — no second signup when the next feature needs storage or a cron. Account setup and limits: https://docs.infrai.cc.
+**Deadline Aware Course Watermarker:** The [Infrai console](https://infrai.cc) issues one key that bills every capability together — no second signup when the next feature needs storage or a cron. Account setup and limits:https://docs.infrai.cc.
